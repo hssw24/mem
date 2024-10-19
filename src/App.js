@@ -33,7 +33,7 @@ function App() {
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [isChecking, setIsChecking] = useState(false);  // Neu: Um zu verhindern, dass weitere Karten aufgedeckt werden
+  const [isChecking, setIsChecking] = useState(false);  // Verhindert, dass während des Vergleichs weitere Karten aufgedeckt werden
 
   const timerRef = useRef(null);
 
@@ -67,7 +67,6 @@ function App() {
     // Wenn zwei Karten umgedreht sind, Versuche zählen und die Karten vergleichen
     if (flippedCards.length === 1) {
       setAttempts(attempts + 1);
-      setIsChecking(true);  // Sperren, bis der Vergleich abgeschlossen ist
       const firstCardIndex = flippedCards[0];
       const secondCardIndex = index;
 
@@ -78,15 +77,17 @@ function App() {
         (firstCard.type === 'question' && firstCard.answer === secondCard.answer) ||
         (firstCard.type === 'answer' && firstCard.answer === secondCard.answer)
       ) {
-        // Übereinstimmung: Karten als "gefunden" markieren
+        // Übereinstimmung: Karten als "gefunden" markieren und weiter spielen
         setMatchedCards([...matchedCards, firstCardIndex, secondCardIndex]);
-      }
-
-      // Nach 3 Sekunden die Karten zurückdrehen
-      setTimeout(() => {
         setFlippedCards([]);
-        setIsChecking(false);  // Entsperren nach dem Vergleich
-      }, 3000);
+      } else {
+        // Keine Übereinstimmung: Wartezeit von 3 Sekunden, dann zurückdrehen
+        setIsChecking(true);  // Sperren, bis der Vergleich abgeschlossen ist
+        setTimeout(() => {
+          setFlippedCards([]);
+          setIsChecking(false);  // Entsperren nach dem Vergleich
+        }, 3000);
+      }
     }
   };
 
