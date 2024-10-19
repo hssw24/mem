@@ -135,7 +135,7 @@ function App() {
       </div>
 
       {gameOver && (
-        <div>           // className="game-over"
+        <div className="game-over">
           <p>Versuche in dieser Runde: {attempts} ֎ 
           Zeit in dieser Runde: {formatTime(time)} ֎ 
           Gesamtzeit: {formatTime(totalTime)} ֎ 
