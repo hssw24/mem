@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 const generateCards = () => {
@@ -27,16 +27,41 @@ function App() {
   const [cards, setCards] = useState(generateCards());
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
+  const [attempts, setAttempts] = useState(0);
+  const [time, setTime] = useState(0);
+  const [rounds, setRounds] = useState(0);
+  const [totalAttempts, setTotalAttempts] = useState(0);
+  const [totalTime, setTotalTime] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+
+  const timerRef = useRef(null);
+
+  // Start den Timer bei Spielbeginn
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setTime(prevTime => prevTime + 10); // 10-Sekunden-Intervalle
+    }, 10000);
+
+    return () => clearInterval(timerRef.current); // Timer beim Beenden des Spiels stoppen
+  }, []);
+
+  useEffect(() => {
+    if (matchedCards.length === cards.length && cards.length > 0) {
+      // Spielende
+      clearInterval(timerRef.current);
+      setGameOver(true);
+      setTotalAttempts(totalAttempts + attempts);
+      setTotalTime(totalTime + time);
+    }
+  }, [matchedCards, cards]);
 
   const handleCardClick = (index) => {
-    // Ignorieren, wenn die Karte schon umgedreht oder ein Match ist
     if (flippedCards.includes(index) || matchedCards.includes(index)) return;
 
-    // Karte umdrehen
     setFlippedCards([...flippedCards, index]);
 
-    // Wenn zwei Karten umgedreht sind, prüfen
     if (flippedCards.length === 1) {
+      setAttempts(attempts + 1); // Zähle einen neuen Versuch
       const firstCardIndex = flippedCards[0];
       const secondCardIndex = index;
 
@@ -47,20 +72,42 @@ function App() {
         (firstCard.type === 'question' && firstCard.answer === secondCard.answer) ||
         (firstCard.type === 'answer' && firstCard.answer === secondCard.answer)
       ) {
-        // Wenn sie übereinstimmen, hinzufügen zu den gefundenen Paaren
         setMatchedCards([...matchedCards, firstCardIndex, secondCardIndex]);
       }
 
-      // Zurücksetzen der umgedrehten Karten nach einer Verzögerung von 1,5 Sekunden
+      // Zurückdrehen der Karten nach 3 Sekunden
       setTimeout(() => {
         setFlippedCards([]);
-      }, 1500);
+      }, 3000);
     }
+  };
+
+  const resetGame = () => {
+    setCards(generateCards());
+    setFlippedCards([]);
+    setMatchedCards([]);
+    setAttempts(0);
+    setTime(0);
+    setGameOver(false);
+
+    timerRef.current = setInterval(() => {
+      setTime(prevTime => prevTime + 10); // Timer wieder starten
+    }, 10000);
+  };
+
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes}m ${seconds}s`;
   };
 
   return (
     <div className="App">
       <h1>Zahlen-Memory</h1>
+      <div>
+        <p>Versuche: {attempts}</p>
+        <p>Zeit: {formatTime(Math.floor(time / 10))}</p>
+      </div>
       <div className="grid">
         {cards.map((card, index) => (
           <div
@@ -77,6 +124,18 @@ function App() {
           </div>
         ))}
       </div>
+
+      {gameOver && (
+        <div className="game-over">
+          <h2>Spiel beendet!</h2>
+          <p>Anzahl der Runden: {rounds + 1}</p>
+          <p>Anzahl der Versuche in dieser Runde: {attempts}</p>
+          <p>Verstrichene Zeit: {formatTime(Math.floor(time / 10))}</p>
+          <p>Gesamtzeit: {formatTime(Math.floor(totalTime / 10))}</p>
+          <p>Gesamtzahl der Versuche: {totalAttempts}</p>
+          <button onClick={() => { setRounds(rounds + 1); resetGame(); }}>Nochmal spielen</button>
+        </div>
+      )}
     </div>
   );
 }

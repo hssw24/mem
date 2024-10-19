@@ -63,3 +63,20 @@
     font-size: 14px;
   }
 }
+
+.game-over {
+  margin-top: 20px;
+}
+
+.game-over button {
+  background-color: #61dafb;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.game-over button:hover {
+  background-color: #4caf50;
+}
