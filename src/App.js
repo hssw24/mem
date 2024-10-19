@@ -51,10 +51,10 @@ function App() {
         setMatchedCards([...matchedCards, firstCardIndex, secondCardIndex]);
       }
 
-      // Zurücksetzen der umgedrehten Karten nach kurzer Verzögerung
+      // Zurücksetzen der umgedrehten Karten nach einer Verzögerung von 1,5 Sekunden
       setTimeout(() => {
         setFlippedCards([]);
-      }, 1000);
+      }, 1500);
     }
   };
 
@@ -65,7 +65,8 @@ function App() {
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`card ${flippedCards.includes(index) || matchedCards.includes(index) ? 'flipped' : ''}`}
+            className={`card ${flippedCards.includes(index) || matchedCards.includes(index) ? 'flipped' : ''} 
+              ${matchedCards.includes(index) ? 'matched' : ''}`}
             onClick={() => handleCardClick(index)}
           >
             {(flippedCards.includes(index) || matchedCards.includes(index)) ? (
