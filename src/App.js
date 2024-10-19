@@ -114,7 +114,7 @@ function App() {
     <div className="App">
       <h1>Zahlen-Memory</h1>
       <div>
-        <p>Versuche: {attempts} · 
+        <p>Versuche: {attempts} ♥ ♥ 
         Zeit: {formatTime(time)}</p>
       </div>
       <div className="grid">
@@ -136,9 +136,9 @@ function App() {
 
       {gameOver && (
         <div className="game-over">
-          <p>Versuche in dieser Runde: {attempts} · 
-          Zeit in dieser Runde: {formatTime(time)} · 
-          Gesamtzeit: {formatTime(totalTime)} · 
+          <p>Versuche in dieser Runde: {attempts} ֎ 
+          Zeit in dieser Runde: {formatTime(time)} ֎ 
+          Gesamtzeit: {formatTime(totalTime)} ֎ 
           Gesamtzahl der Versuche: {totalAttempts}</p>
           <button onClick={() => { setRounds(rounds + 1); resetGame(); }}>Nochmal spielen</button>
         </div>
