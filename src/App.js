@@ -33,18 +33,20 @@ function App() {
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);  // Neu: Um zu verhindern, dass weitere Karten aufgedeckt werden
 
   const timerRef = useRef(null);
 
   // Start den Timer bei Spielbeginn
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      setTime(prevTime => prevTime + 10); // 10-Sekunden-Intervalle
-    }, 10000);
+      setTime(prevTime => prevTime + 1); // Zeit in Sekunden zählen
+    }, 1000);
 
     return () => clearInterval(timerRef.current); // Timer beim Beenden des Spiels stoppen
   }, []);
 
+  // Prüfen, ob das Spiel zu Ende ist (alle Karten gefunden)
   useEffect(() => {
     if (matchedCards.length === cards.length && cards.length > 0) {
       // Spielende
@@ -56,12 +58,16 @@ function App() {
   }, [matchedCards, cards]);
 
   const handleCardClick = (index) => {
-    if (flippedCards.includes(index) || matchedCards.includes(index)) return;
+    // Verhindere Klicken während des Kartenvergleichs oder wenn die Karte schon umgedreht ist
+    if (isChecking || flippedCards.includes(index) || matchedCards.includes(index)) return;
 
+    // Karte umdrehen
     setFlippedCards([...flippedCards, index]);
 
+    // Wenn zwei Karten umgedreht sind, Versuche zählen und die Karten vergleichen
     if (flippedCards.length === 1) {
-      setAttempts(attempts + 1); // Zähle einen neuen Versuch
+      setAttempts(attempts + 1);
+      setIsChecking(true);  // Sperren, bis der Vergleich abgeschlossen ist
       const firstCardIndex = flippedCards[0];
       const secondCardIndex = index;
 
@@ -72,12 +78,14 @@ function App() {
         (firstCard.type === 'question' && firstCard.answer === secondCard.answer) ||
         (firstCard.type === 'answer' && firstCard.answer === secondCard.answer)
       ) {
+        // Übereinstimmung: Karten als "gefunden" markieren
         setMatchedCards([...matchedCards, firstCardIndex, secondCardIndex]);
       }
 
-      // Zurückdrehen der Karten nach 3 Sekunden
+      // Nach 3 Sekunden die Karten zurückdrehen
       setTimeout(() => {
         setFlippedCards([]);
+        setIsChecking(false);  // Entsperren nach dem Vergleich
       }, 3000);
     }
   };
@@ -91,8 +99,8 @@ function App() {
     setGameOver(false);
 
     timerRef.current = setInterval(() => {
-      setTime(prevTime => prevTime + 10); // Timer wieder starten
-    }, 10000);
+      setTime(prevTime => prevTime + 1);
+    }, 1000);
   };
 
   const formatTime = (timeInSeconds) => {
@@ -106,7 +114,7 @@ function App() {
       <h1>Zahlen-Memory</h1>
       <div>
         <p>Versuche: {attempts}</p>
-        <p>Zeit: {formatTime(Math.floor(time / 10))}</p>
+        <p>Zeit: {formatTime(time)}</p>
       </div>
       <div className="grid">
         {cards.map((card, index) => (
@@ -130,8 +138,8 @@ function App() {
           <h2>Spiel beendet!</h2>
           <p>Anzahl der Runden: {rounds + 1}</p>
           <p>Anzahl der Versuche in dieser Runde: {attempts}</p>
-          <p>Verstrichene Zeit: {formatTime(Math.floor(time / 10))}</p>
-          <p>Gesamtzeit: {formatTime(Math.floor(totalTime / 10))}</p>
+          <p>Verstrichene Zeit: {formatTime(time)}</p>
+          <p>Gesamtzeit: {formatTime(totalTime)}</p>
           <p>Gesamtzahl der Versuche: {totalAttempts}</p>
           <button onClick={() => { setRounds(rounds + 1); resetGame(); }}>Nochmal spielen</button>
         </div>
