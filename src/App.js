@@ -114,8 +114,8 @@ function App() {
     <div className="App">
       <h1>Zahlen-Memory</h1>
       <div>
-        <p>Versuche: {attempts}</p>
-        <p>Zeit: {formatTime(time)}</p>
+        <p>Versuche: {attempts} · 
+        Zeit: {formatTime(time)}</p>
       </div>
       <div className="grid">
         {cards.map((card, index) => (
@@ -136,12 +136,10 @@ function App() {
 
       {gameOver && (
         <div className="game-over">
-          <h2>Spiel beendet!</h2>
-          <p>Anzahl der Runden: {rounds + 1}</p>
-          <p>Anzahl der Versuche in dieser Runde: {attempts}</p>
-          <p>Verstrichene Zeit: {formatTime(time)}</p>
-          <p>Gesamtzeit: {formatTime(totalTime)}</p>
-          <p>Gesamtzahl der Versuche: {totalAttempts}</p>
+          <p>Versuche in dieser Runde: {attempts} · 
+          Zeit in dieser Runde: {formatTime(time)} · 
+          Gesamtzeit: {formatTime(totalTime)} · 
+          Gesamtzahl der Versuche: {totalAttempts}</p>
           <button onClick={() => { setRounds(rounds + 1); resetGame(); }}>Nochmal spielen</button>
         </div>
       )}
